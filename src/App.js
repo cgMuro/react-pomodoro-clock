@@ -1,24 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
+import { Container, Row } from 'react-bootstrap';
+
 import './App.css';
+import Header from './components/Header';
+import SetTimer from './components/SetTimer';
+import Timer from './components/Timer';
+import Controls from './components/Controls';
+import { BreakProvider } from './context/BreakState';
+import { SessionProvider } from './context/SessionState';
+import { TimerProvider } from './context/TimerState';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container-fluid d-flex justify-content-center align-items-center flex-column" id="App">
+      <div className="row">
+        <Header />
+      </div>
+      <SessionProvider>
+        <BreakProvider>
+          <div className="row" id="SetTimer">
+            <SetTimer />
+          </div>
+          <div className="row" id="Timer">
+            <Timer />
+          </div>
+          <TimerProvider>
+            <div className="row">
+              <Controls />
+            </div>
+          </TimerProvider>
+        </BreakProvider>
+      </SessionProvider>
     </div>
   );
 }
