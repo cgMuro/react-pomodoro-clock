@@ -1,248 +1,117 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import { SessionContext } from '../context/SessionState';
 import { BreakContext } from '../context/BreakState';
-import { TimerContext } from '../context/TimerState';
+import { PlayContext } from '../context/PlayState';
+import { TimerTimeContext } from '../context/TimerTimeState';
+
+import useInterval from '../customHooks/useInterval';
 
 
 export default function Controls() {
 
-    const { sessionTime, timerTime, setTimerTime } = useContext(SessionContext);
+    const { sessionTime, sessionIsRunning } = useContext(SessionContext);
+    const { breakTime } = useContext(BreakContext);
+    const { play, setPlay } = useContext(PlayContext);
+    const { setTimerTime, setShowTimerTime } = useContext(TimerTimeContext);
 
-    const { breakTime, startBreak, setStartBreak } = useContext(BreakContext);
+    const minutes = useRef(sessionTime - 1);
+    const seconds = useRef(59);
 
-    const { timer, dispatch, playPause, setPlayPause } = useContext(TimerContext);
+    useEffect(() => {
+        // Set the minutes and seconds every time sessionTime and breakTime are incremented or decremented
+        if (sessionIsRunning.current) {
+            minutes.current = sessionTime - 1;
+            seconds.current = 59;
+        } else {
+            minutes.current = breakTime - 1;
+            seconds.current = 59;
+        }
 
+        setTimerTime(`${("0" + minutes.current).slice(-2)}:${("0" + seconds.current).slice(-2)}`);
 
-    
+    }, [sessionTime, breakTime]);
 
-    // let intervalID;
+    // TIMER FUNCTION
+    const timer = () => {
 
-    // const startTimer = (time) => {
+        setPlay((prevState) => !prevState);
+        // Show the time that changes
+        setShowTimerTime(true);
 
-    //     let minutes = time - 1;
-    //     let seconds = 60;
-
-    //     setTimerTime(`${time}:00`);
-
-    //     intervalID = setInterval(() => {
-    //         // Update time every second
-    //         seconds--;
-    //         setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-    //         // Update minutes when seconds are zero
-    //         if (seconds === 0) {
-    //             seconds = '00';
-    //             setTimeout(() => {
-    //                 seconds = 59;
-    //                 minutes--;
-    //                 setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-    //             }, 1000)
-    //         };
-
-
-    //         if(playPause === false) {
-    //             clearInterval(intervalID);
-    //         }
-
-    //     }, 1000);
-    // }
-
-    // const stopTimer = (time) => {
-
-    //     setTimerTime(time);
-    //     clearInterval(intervalID);
-    // }
-
-    // const resetTimer = (time) => {
-
-    //     dispatch({ type: 'RESET_TIMER' });
-
-    //     clearInterval(intervalID);
-    //     setTimerTime(time);
-    // }
-
-
-    const timerTimer = () => {
-
-        // if (playPause) {
-        //     // dispatch({ type: 'START_TIMER' });
-        //     startTimer(timerTime);
-        //     setPlayPause((prevState) => !prevState);
-        // } else {
-        //     // dispatch({ type: 'STOP_TIMER' });
-        //     stopTimer(timerTime);
-        //     setPlayPause((prevState) => !prevState);
-        // }
-
-
-        // if (timer.start) {
-        //     startTimer(timerTime);
-        // } else if (timer.stop) {
-            
-        // }
-
-        let intervalID;
-
-        let minutes = timerTime - 1;
-        let seconds = 60;
-
-        setTimerTime(`${timerTime}:00`);
-
-        intervalID = setInterval(() => {
-            // Update time every second
-            seconds--;
-            setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-            // Update minutes when seconds are zero
-            if (seconds === 0) {
-                seconds = '00';
-                setTimeout(() => {
-                    seconds = 59;
-                    minutes--;
-                    setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-                }, 1000)
-            };
-
-            console.log(playPause, 'befrore')
-            if(playPause === false) {
-                clearInterval(intervalID);
-            }
-
-        }, 1000);
-
+        if (!play) {
+            setTimerTime(`${("0" + minutes.current).slice(-2)}:${("0" + seconds.current).slice(-2)}`);
+        }
     }
+
+
+    // RESET FUNCTION
+    const reset = () => {
+        // Reset every value
+        setPlay(false);
+        setShowTimerTime(false)
+        sessionIsRunning.current = true;
+        setTimerTime(sessionTime);
+
+        // Reset minutes and seconds
+        minutes.current = sessionTime - 1;
+        seconds.current = 59;
+    }
+
+
+
+    useInterval(() => {
+        // Update time every second
+        seconds.current--;
+        setTimerTime(`${("0" + minutes.current).slice(-2)}:${("0" + seconds.current).slice(-2)}`);
+
+        // Update minutes when seconds are zero
+        if (seconds.current === 0) {
+
+            setTimerTime(`${("0" + minutes.current).slice(-2)}:00`);
+
+            if (minutes.current === 0) {
+                // Start Break when Session finishes
+                minutes.current = breakTime - 1;
+                seconds.current = 60;
+
+                // Switch to break
+                sessionIsRunning.current = !sessionIsRunning.current;
+
+                // If break ends start new cycle
+                if (sessionIsRunning.current) {
+                    minutes.current = sessionTime - 1;
+                    seconds.current = 60;
+                }
+
+            } else {
+                // Decrement minutes when seconds = 0 but not minutes
+                setTimeout(() => {
+                    seconds.current = 59;
+                    minutes.current--;
+                    setTimerTime(`${("0" + minutes.current).slice(-2)}:${("0" + seconds.current).slice(-2)}`);
+                }, 1000);
+            }
+        };
+
+    }, play ? 1000 : null);
+
 
 
     return (
         <div>
-            <i 
-                className={`fa ${playPause ? 'fa-play' : 'fa-pause'}`} 
+            <i
+                id="start_stop"
+                className={`fa ${play ? 'fa-pause' : 'fa-play'}`}
                 onClick={() => {
-                    timerTimer();
+                    timer();
                 }}></i>
-            <i 
+            <i
+                id="reset"
                 className="fa fa-repeat ml-3"
                 onClick={() => {
-                    // dispatch({ type: 'RESET_TIMER' });
-                    // resetTimer(sessionTime, breakTime);
+                    reset();
                 }}>
             </i>
         </div >
     )
 }
-
-
-
-
-
-
-
-
-// const timer = () => {
-
-//     let interval;
-//     let minutes;
-//     let seconds;
-
-
-
-
-//     setPlayPause((prevState) => !prevState);
-//     setTimerTime(`${timerTime}:00`);
-
-//     if (playPause) {
-
-//         minutes = timerTime - 1;
-//         seconds = 60;
-
-//         interval = setInterval(() => {
-
-//             // Update time every second
-//             seconds--;
-//             setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-
-//             // Update minutes when seconds are zero
-//             if (seconds === 0) {
-//                 seconds = '00';
-//                 setTimeout(() => {
-//                     seconds = 59;
-//                     minutes--;
-//                     setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-//                 }, 1000)
-//             };
-
-
-//             // Start break when session finishes
-//             // if (minutes === 0 && seconds === 0) {
-//             //     clearInterval()
-//             // }
-
-//         }, 1000);
-//     }
-
-//     if (!playPause) {
-//         console.log(minutes, seconds);
-//         setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-//         clearInterval(interval);
-
-
-//     } else if (reset) {
-
-//         setPlayPause((prevState) => !prevState);
-//         reset = false;
-
-//         clearInterval(interval);
-//         setTimerTime(sessionTime);
-
-//         console.log('hey');
-//     }
-
-
-// }
-
-
-// const timer = () => {
-
-//     setTimerTime(`${timerTime}:00`);
-
-//     let minutes = timerTime - 1;
-//     let seconds = 60;
-//     let intervalID;
-
-
-
-//     if (play) {
-//         intervalID = setInterval(() => {
-//             seconds--;
-//             setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-
-
-//             if (seconds === 0) {
-//                 seconds = '00';
-//                 setTimeout(() => {
-//                     seconds = 59;
-//                     minutes--;
-//                     setTimerTime(`${("0" + minutes).slice(-2)}:${seconds}`);
-//                 }, 1000)
-//             };
-
-
-//         }, 1000);
-
-//         setPlayPause((prevState) => !prevState);
-
-//         if (play === false) {
-//             clearInterval(intervalID);
-//             setTimerTime(timerTime);
-//             console.log('dbasi');
-//         }
-//     }
-
-//     if (reset) {
-//         clearInterval(intervalID);
-
-//     }
-
-
-
-//     play = !play;
-//     console.log(play)
-// }

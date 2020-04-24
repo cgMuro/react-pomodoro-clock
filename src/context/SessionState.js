@@ -1,5 +1,5 @@
-import React, { createContext, useReducer, useState } from 'react';
-import TimeReducer from './TimeReducer';
+import React, { createContext, useReducer, useRef } from 'react';
+import TimeReducer from './reducers/TimeReducer';
 
 export const SessionContext = createContext();
 
@@ -7,7 +7,7 @@ export const SessionProvider = (props) => {
 
     const [ sessionTime, dispatch ] = useReducer(TimeReducer, 25);
 
-    const [ timerTime, setTimerTime ] = useState(sessionTime);
+    const sessionIsRunning = useRef(true);
 
     const addTime = () => {
         dispatch({ type: 'ADD_TIME' });
@@ -17,15 +17,8 @@ export const SessionProvider = (props) => {
         dispatch({ type: 'SUB_TIME' });
     }
 
-    // const setTime = (newTime) => {
-    //     dispatch({ 
-    //         type: 'SET_TIME',
-    //         payload: newTime 
-    //     });
-    // }
-
     return (
-        <SessionContext.Provider value={{ sessionTime, addTime, subTime, timerTime, setTimerTime }}>
+        <SessionContext.Provider value={{ sessionTime, addTime, subTime, sessionIsRunning }}>
             { props.children }
         </SessionContext.Provider>
     )

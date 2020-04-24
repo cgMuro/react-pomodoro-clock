@@ -4,8 +4,6 @@ export default function TimeReducer(state, action) {
             return state < 60 ? state + 1 : state;
         case 'SUB_TIME':
             return state > 1 ? state - 1 : state;
-        case 'SET_TIME':
-            return action.payload;
         default:
             return state;
     }

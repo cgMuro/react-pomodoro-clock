@@ -1,14 +1,13 @@
 import React from 'react';
-import { Container, Row } from 'react-bootstrap';
-
 import './App.css';
 import Header from './components/Header';
-import SetTimer from './components/SetTimer';
+import SetTimer from './components/setting_the_timer/SetTimer';
 import Timer from './components/Timer';
 import Controls from './components/Controls';
 import { BreakProvider } from './context/BreakState';
 import { SessionProvider } from './context/SessionState';
-import { TimerProvider } from './context/TimerState';
+import { PlayProvider } from './context/PlayState';
+import { TimerTimeProvider } from './context/TimerTimeState';
 
 function App() {
   return (
@@ -18,17 +17,19 @@ function App() {
       </div>
       <SessionProvider>
         <BreakProvider>
-          <div className="row" id="SetTimer">
-            <SetTimer />
-          </div>
-          <div className="row" id="Timer">
-            <Timer />
-          </div>
-          <TimerProvider>
-            <div className="row">
-              <Controls />
-            </div>
-          </TimerProvider>
+          <PlayProvider>
+            <TimerTimeProvider>
+              <div className="row" id="SetTimer">
+                <SetTimer />
+              </div>
+              <div className="row" id="Timer">
+                <Timer />
+              </div>
+              <div className="row">
+                <Controls />
+              </div>
+            </TimerTimeProvider>
+          </PlayProvider>
         </BreakProvider>
       </SessionProvider>
     </div>
