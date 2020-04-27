@@ -1,4 +1,5 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useContext, useRef, useEffect, useState } from 'react';
+import { Tooltip, OverlayTrigger } from 'react-bootstrap';
 import { SessionContext } from '../context/SessionState';
 import { BreakContext } from '../context/BreakState';
 import { PlayContext } from '../context/PlayState';
@@ -58,7 +59,6 @@ export default function Controls() {
     }
 
 
-
     useInterval(() => {
         // Update time every second
         seconds.current--;
@@ -96,22 +96,44 @@ export default function Controls() {
     }, play ? 1000 : null);
 
 
+    // Tooltips
+    const tooltipStart_stop = (
+        <Tooltip id="tooltipStart_stop">
+            <p style={{ height: '0.5vh' }}>
+                Click to {play ? 'pause' : 'play'}
+            </p>
+        </Tooltip>
+    );
+
+    const tooltipReset = (
+        <Tooltip id="tooltipReset">
+            <p style={{ height: '0.5vh' }}>
+                Click to reset the timer
+            </p>
+        </Tooltip>
+    );
+
 
     return (
         <div>
-            <i
-                id="start_stop"
-                className={`fa ${play ? 'fa-pause' : 'fa-play'}`}
-                onClick={() => {
-                    timer();
-                }}></i>
-            <i
-                id="reset"
-                className="fa fa-repeat ml-3"
-                onClick={() => {
-                    reset();
-                }}>
-            </i>
+            <OverlayTrigger placement="bottom" overlay={tooltipStart_stop}>
+                <i
+                    id="start_stop"
+                    className={`fa ${play ? 'fa-pause' : 'fa-play'}`}
+                    onClick={() => {
+                        timer();
+                    }}></i>
+            </OverlayTrigger>
+            
+            <OverlayTrigger placement="bottom" overlay={tooltipReset}>
+                <i
+                    id="reset"
+                    className="fa fa-repeat ml-3"
+                    onClick={() => {
+                        reset();
+                    }}>
+                </i>
+            </OverlayTrigger>
         </div >
     )
 }
