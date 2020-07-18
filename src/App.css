@@ -1,17 +1,27 @@
-#App {
-    margin-top: 5%;
+body {
+    background-image: linear-gradient(to right, #f83600 0%, #f9d423 100%);
 }
 
-.row {
-    margin: 3rem 0;
+#App {
+    margin-top: 1rem;
+}
+
+#title {
+    color: rgb(214, 4, 4);
 }
 
 #SetTimer {
+    border: 5px solid rgb(214, 4, 4);
+    padding: 35px 0 15px;
     width: 40%;
 }
 
-#Timer {
-    border: 5px solid black;
-    border-radius: 20%;
-    padding: 20px;
+#break-label, #session-label {
+    font-size: 23px;
+    text-transform: uppercase;
+    color: black
+}
+
+#reset, #start_stop {
+    cursor: pointer;
 }

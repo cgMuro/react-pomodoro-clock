@@ -12,20 +12,20 @@ import { TimerTimeProvider } from './context/TimerTimeState';
 function App() {
   return (
     <div className="container-fluid d-flex justify-content-center align-items-center flex-column" id="App">
-      <div className="row">
+      <div className="row mt-5 mb-4">
         <Header />
       </div>
       <SessionProvider>
         <BreakProvider>
           <PlayProvider>
             <TimerTimeProvider>
-              <div className="row" id="SetTimer">
+              <div className="row mt-5 mb-5" id="SetTimer">
                 <SetTimer />
               </div>
-              <div className="row" id="Timer">
+              <div className="row mt-5 mb-5" id="Timer">
                 <Timer />
               </div>
-              <div className="row">
+              <div className="row mt-5 mb-5">
                 <Controls />
               </div>
             </TimerTimeProvider>
